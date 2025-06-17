@@ -10,9 +10,14 @@ export class RevenueCatClient {
   async request<T>(
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
     endpoint: string,
-    body?: any
+    body?: any,
+    params?: Record<string, string>
   ): Promise<T> {
-    const url = `${this.config.revenueCatApiUrl}${endpoint}`;
+    let url = `${this.config.revenueCatApiUrl}${endpoint}`;
+    if (params) {
+      const queryString = new URLSearchParams(params).toString();
+      url += `?${queryString}`;
+    }
     const requestId = crypto.randomUUID();
     
     this.logger.info({ requestId, method, url }, 'HTTP request started');
