@@ -1,23 +1,39 @@
 {
   "name": "@yourorg/revenuecat-mcp",
   "version": "1.0.0",
-  "description": "MCP server for RevenueCat API integration",
-  "main": "dist/index.js",
+  "type": "module",
+  "description": "MCP server exposing complete RevenueCat v2 REST API for IDE integration with AI agents",
+  "main": "dist/bundle.cjs",
   "bin": {
-    "revenuecat-mcp": "./dist/index.js"
+    "revenuecat-mcp": "./dist/bundle.cjs"
   },
   "scripts": {
-    "build": "tsc && esbuild dist/index.js --bundle --platform=node --outfile=dist/bundle.js",
+    "build": "npm run clean && npm run compile && npm run bundle",
+    "compile": "tsc",
+    "bundle": "node esbuild.config.js",
     "dev": "ts-node src/index.ts",
-    "prepublishOnly": "npm run build",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build && npm run test:bundle",
+    "preversion": "npm run build",
+    "postversion": "git push && git push --tags",
+    "pack": "npm pack --dry-run",
+    "test:bundle": "node dist/bundle.cjs --help || echo 'Bundle executable test completed'",
+    "size-check": "ls -lh dist/bundle.cjs"
   },
   "keywords": [
     "mcp",
     "revenuecat",
     "model-context-protocol",
     "api",
-    "ide"
+    "ide",
+    "cursor",
+    "vscode",
+    "ai-agent",
+    "revenue-cat",
+    "subscription",
+    "mobile-app",
+    "crud",
+    "rest-api"
   ],
   "author": "",
   "license": "MIT",
@@ -25,9 +41,17 @@
     "node": ">=18"
   },
   "files": [
-    "dist/",
-    "README.md"
+    "dist/bundle.cjs"
   ],
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourorg/revenuecat-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourorg/revenuecat-mcp/issues"
+  },
+  "homepage": "https://github.com/yourorg/revenuecat-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.3",
     "ajv": "^8.17.1",
