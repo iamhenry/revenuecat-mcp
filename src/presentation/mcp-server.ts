@@ -85,12 +85,13 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 name: { type: 'string', description: 'Name of the offering' },
                 description: { type: 'string', description: 'Description of the offering' },
                 is_default: { type: 'boolean', description: 'Whether this is the default offering' },
                 packages: { type: 'array', items: { type: 'string' }, description: 'Package IDs to include' }
               },
-              required: ['name']
+              required: ['project_id', 'name']
             }
           },
           GetOffering: {
@@ -98,9 +99,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The offering ID' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           UpdateOffering: {
@@ -108,13 +110,14 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The offering ID' },
                 name: { type: 'string', description: 'Name of the offering' },
                 description: { type: 'string', description: 'Description of the offering' },
                 is_default: { type: 'boolean', description: 'Whether this is the default offering' },
                 packages: { type: 'array', items: { type: 'string' }, description: 'Package IDs to include' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           DeleteOffering: {
@@ -122,9 +125,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The offering ID' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           ListOfferings: {
@@ -132,9 +136,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 cursor: { type: 'string', description: 'Pagination cursor for next page' }
               },
-              required: []
+              required: ['project_id']
             }
           },
           CreateEntitlement: {
@@ -199,13 +204,14 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 identifier: { type: 'string', description: 'Unique identifier for the product' },
                 name: { type: 'string', description: 'Name of the product' },
                 description: { type: 'string', description: 'Description of the product' },
                 type: { type: 'string', enum: ['subscription', 'non_consumable', 'consumable'], description: 'Product type' },
                 store_identifiers: { type: 'object', description: 'Store-specific identifiers' }
               },
-              required: ['identifier', 'name', 'type']
+              required: ['project_id', 'identifier', 'name', 'type']
             }
           },
           GetProduct: {
@@ -213,9 +219,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The product ID' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           UpdateProduct: {
@@ -223,6 +230,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The product ID' },
                 identifier: { type: 'string', description: 'Unique identifier for the product' },
                 name: { type: 'string', description: 'Name of the product' },
@@ -230,7 +238,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
                 type: { type: 'string', enum: ['subscription', 'non_consumable', 'consumable'], description: 'Product type' },
                 store_identifiers: { type: 'object', description: 'Store-specific identifiers' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           DeleteProduct: {
@@ -238,9 +246,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 id: { type: 'string', description: 'The product ID' }
               },
-              required: ['id']
+              required: ['project_id', 'id']
             }
           },
           ListProducts: {
@@ -248,9 +257,10 @@ export function createMCPServer(config: Config, logger: Logger): Server {
             inputSchema: {
               type: 'object',
               properties: {
+                project_id: { type: 'string', description: 'The project ID' },
                 cursor: { type: 'string', description: 'Pagination cursor for next page' }
               },
-              required: []
+              required: ['project_id']
             }
           },
           CreatePackage: {
@@ -384,7 +394,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
       // Route to appropriate use case based on tool name
       switch (name) {
         case 'CreateOffering': {
-          const result = await createOfferingUseCase.execute(validatedArgs);
+          const { project_id, ...offeringData } = validatedArgs;
+          const result = await createOfferingUseCase.execute(project_id, offeringData);
           return {
             content: [
               {
@@ -396,7 +407,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetOffering': {
-          const result = await getOfferingUseCase.execute(validatedArgs.id);
+          const result = await getOfferingUseCase.execute(validatedArgs.project_id, validatedArgs.id);
           return {
             content: [
               {
@@ -408,8 +419,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdateOffering': {
-          const { id, ...updateData } = validatedArgs;
-          const result = await updateOfferingUseCase.execute(id, updateData);
+          const { project_id, id, ...updateData } = validatedArgs;
+          const result = await updateOfferingUseCase.execute(project_id, id, updateData);
           return {
             content: [
               {
@@ -421,7 +432,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeleteOffering': {
-          await deleteOfferingUseCase.execute(validatedArgs.id);
+          await deleteOfferingUseCase.execute(validatedArgs.project_id, validatedArgs.id);
           return {
             content: [
               {
@@ -433,7 +444,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'ListOfferings': {
-          const result = await listOfferingsUseCase.execute(validatedArgs.cursor);
+          const result = await listOfferingsUseCase.execute(validatedArgs.project_id, validatedArgs.cursor);
           return {
             content: [
               {
@@ -506,7 +517,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'CreateProduct': {
-          const result = await createProductUseCase.execute(validatedArgs);
+          const { project_id, ...productData } = validatedArgs;
+          const result = await createProductUseCase.execute(project_id, productData);
           return {
             content: [
               {
@@ -518,7 +530,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetProduct': {
-          const result = await getProductUseCase.execute(validatedArgs.id);
+          const result = await getProductUseCase.execute(validatedArgs.project_id, validatedArgs.id);
           return {
             content: [
               {
@@ -530,8 +542,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdateProduct': {
-          const { id, ...updateData } = validatedArgs;
-          const result = await updateProductUseCase.execute(id, updateData);
+          const { project_id, id, ...updateData } = validatedArgs;
+          const result = await updateProductUseCase.execute(project_id, id, updateData);
           return {
             content: [
               {
@@ -543,7 +555,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeleteProduct': {
-          await deleteProductUseCase.execute(validatedArgs.id);
+          await deleteProductUseCase.execute(validatedArgs.project_id, validatedArgs.id);
           return {
             content: [
               {
@@ -555,7 +567,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'ListProducts': {
-          const result = await listProductsUseCase.execute(validatedArgs.cursor);
+          const result = await listProductsUseCase.execute(validatedArgs.project_id, validatedArgs.cursor);
           return {
             content: [
               {

@@ -5,6 +5,6 @@ export function createLogger(config?: Config) {
   return pino({
     level: config?.logLevel || 'info',
     timestamp: pino.stdTimeFunctions.isoTime,
-    redact: ['config.revenueCatSecretKey', '*.secret*', '*.token*']
+    redact: ['config.revenueCatSecretKey', 'config.secret', 'config.token', 'secret', 'token', 'key']
   });
 }

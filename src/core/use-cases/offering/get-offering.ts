@@ -4,7 +4,7 @@ import { Offering } from '../../entities/offering.js';
 export class GetOfferingUseCase {
   constructor(private client: RevenueCatClient) {}
 
-  async execute(id: string): Promise<Offering> {
-    return this.client.request<Offering>('GET', `/offerings/${id}`);
+  async execute(projectId: string, id: string): Promise<Offering> {
+    return this.client.request<Offering>('GET', `/projects/${projectId}/offerings/${id}`);
   }
 }

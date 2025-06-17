@@ -4,8 +4,8 @@ import { ListOfferingsResponse } from '../../entities/offering.js';
 export class ListOfferingsUseCase {
   constructor(private client: RevenueCatClient) {}
 
-  async execute(cursor?: string): Promise<ListOfferingsResponse> {
+  async execute(projectId: string, cursor?: string): Promise<ListOfferingsResponse> {
     const params = cursor ? { cursor } : undefined;
-    return this.client.request<ListOfferingsResponse>('GET', '/offerings', undefined, params);
+    return this.client.request<ListOfferingsResponse>('GET', `/projects/${projectId}/offerings`, undefined, params);
   }
 }

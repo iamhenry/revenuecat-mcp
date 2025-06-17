@@ -1,5 +1,5 @@
 {
-  "name": "@yourorg/revenuecat-mcp",
+  "name": "revenuecat-mcp",
   "version": "1.0.0",
   "type": "module",
   "description": "MCP server exposing complete RevenueCat v2 REST API for IDE integration with AI agents",

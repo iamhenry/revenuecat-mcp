@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import { writeFileSync, readFileSync } from 'fs';
 
 await build({
   entryPoints: ['dist/index.js'],
@@ -9,8 +10,14 @@ await build({
   external: [],
   minify: true,
   sourcemap: false,
-  banner: {
-    js: '#!/usr/bin/env node'
-  },
   format: 'cjs'
 });
+
+// Add shebang manually to avoid syntax issues
+const bundleContent = readFileSync('dist/bundle.cjs', 'utf8');
+// Remove any existing shebangs first
+const cleanContent = bundleContent.replace(/^#!.*\n/gm, '');
+const bundleWithShebang = '#!/usr/bin/env node\n' + cleanContent;
+writeFileSync('dist/bundle.cjs', bundleWithShebang);
+
+console.log('Bundle created with shebang');

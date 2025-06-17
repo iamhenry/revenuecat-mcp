@@ -4,7 +4,7 @@ import { CreateProductRequest, Product } from '../../entities/product.js';
 export class CreateProductUseCase {
   constructor(private client: RevenueCatClient) {}
 
-  async execute(request: CreateProductRequest): Promise<Product> {
-    return this.client.request<Product>('POST', '/products', request);
+  async execute(projectId: string, request: CreateProductRequest): Promise<Product> {
+    return this.client.request<Product>('POST', `/projects/${projectId}/products`, request);
   }
 }

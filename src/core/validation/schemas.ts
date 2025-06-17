@@ -10,6 +10,17 @@ export const IdParamSchema = {
   additionalProperties: false
 };
 
+// Base schema for project-scoped ID parameter
+export const ProjectIdParamSchema = {
+  type: 'object',
+  properties: {
+    project_id: { type: 'string', minLength: 1 },
+    id: { type: 'string', minLength: 1 }
+  },
+  required: ['project_id', 'id'],
+  additionalProperties: false
+};
+
 // Base schema for cursor-based list operations
 export const CursorParamSchema = {
   type: 'object',
@@ -20,10 +31,22 @@ export const CursorParamSchema = {
   additionalProperties: false
 };
 
+// Base schema for project-scoped cursor-based list operations
+export const ProjectCursorParamSchema = {
+  type: 'object',
+  properties: {
+    project_id: { type: 'string', minLength: 1 },
+    cursor: { type: 'string', minLength: 1, nullable: true }
+  },
+  required: ['project_id'],
+  additionalProperties: false
+};
+
 // OFFERING SCHEMAS
 export const CreateOfferingSchema = {
   type: 'object',
   properties: {
+    project_id: { type: 'string', minLength: 1 },
     name: { type: 'string', minLength: 1 },
     description: { type: 'string', nullable: true },
     is_default: { type: 'boolean', nullable: true },
@@ -33,13 +56,14 @@ export const CreateOfferingSchema = {
       nullable: true 
     }
   },
-  required: ['name'],
+  required: ['project_id', 'name'],
   additionalProperties: false
 };
 
 export const UpdateOfferingSchema = {
   type: 'object',
   properties: {
+    project_id: { type: 'string', minLength: 1 },
     id: { type: 'string', minLength: 1 },
     name: { type: 'string', minLength: 1, nullable: true },
     description: { type: 'string', nullable: true },
@@ -50,7 +74,7 @@ export const UpdateOfferingSchema = {
       nullable: true 
     }
   },
-  required: ['id'],
+  required: ['project_id', 'id'],
   additionalProperties: false
 };
 
@@ -92,6 +116,7 @@ export const UpdateEntitlementSchema = {
 export const CreateProductSchema = {
   type: 'object',
   properties: {
+    project_id: { type: 'string', minLength: 1 },
     identifier: { type: 'string', minLength: 1 },
     name: { type: 'string', minLength: 1 },
     description: { type: 'string', nullable: true },
@@ -102,13 +127,14 @@ export const CreateProductSchema = {
       nullable: true
     }
   },
-  required: ['identifier', 'name', 'type'],
+  required: ['project_id', 'identifier', 'name', 'type'],
   additionalProperties: false
 };
 
 export const UpdateProductSchema = {
   type: 'object',
   properties: {
+    project_id: { type: 'string', minLength: 1 },
     id: { type: 'string', minLength: 1 },
     identifier: { type: 'string', minLength: 1, nullable: true },
     name: { type: 'string', minLength: 1, nullable: true },
@@ -120,7 +146,7 @@ export const UpdateProductSchema = {
       nullable: true
     }
   },
-  required: ['id'],
+  required: ['project_id', 'id'],
   additionalProperties: false
 };
 
@@ -188,10 +214,10 @@ export const UpdatePriceExperimentSchema = {
 export const VALIDATION_SCHEMAS = {
   // Offering schemas
   CreateOffering: CreateOfferingSchema,
-  GetOffering: IdParamSchema,
+  GetOffering: ProjectIdParamSchema,
   UpdateOffering: UpdateOfferingSchema,
-  DeleteOffering: IdParamSchema,
-  ListOfferings: CursorParamSchema,
+  DeleteOffering: ProjectIdParamSchema,
+  ListOfferings: ProjectCursorParamSchema,
   
   // Entitlement schemas
   CreateEntitlement: CreateEntitlementSchema,
@@ -202,10 +228,10 @@ export const VALIDATION_SCHEMAS = {
   
   // Product schemas
   CreateProduct: CreateProductSchema,
-  GetProduct: IdParamSchema,
+  GetProduct: ProjectIdParamSchema,
   UpdateProduct: UpdateProductSchema,
-  DeleteProduct: IdParamSchema,
-  ListProducts: CursorParamSchema,
+  DeleteProduct: ProjectIdParamSchema,
+  ListProducts: ProjectCursorParamSchema,
   
   // Package schemas
   CreatePackage: CreatePackageSchema,
