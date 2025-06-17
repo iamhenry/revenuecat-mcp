@@ -493,4 +493,109 @@ Since you'll be doing manual testing:
 
 ---
 
-*This guide provides a complete roadmap for building the MCP RevenueCat wrapper. Follow the phases sequentially, and you'll have a production-ready MCP server that integrates seamlessly with modern IDEs.*
+## FUTURE ROADMAP - PRODUCT BACKLOG
+
+### V2: OPENAPI GENERALIZATION MVP
+
+**Vision**: Transform the current RevenueCat-specific MCP server into a generic OpenAPI-powered MCP server that can work with any REST API that provides OpenAPI specifications.
+
+#### Epic 1: Core OpenAPI Parser Engine
+- **Story 1.1**: Replace hardcoded RevenueCat entities with dynamic OpenAPI schema parsing
+- **Story 1.2**: Auto-generate MCP tools from OpenAPI paths and operations
+- **Story 1.3**: Dynamic validation using OpenAPI schemas instead of custom validation
+- **Story 1.4**: Generic authentication support (Bearer, API Key, Basic Auth)
+
+#### Epic 2: Configuration System
+- **Story 2.1**: Create OpenAPI MCP configuration interface (`specUrl`, `authConfig`, `baseUrl`)
+- **Story 2.2**: Support multiple specification formats (URL, local file, embedded)
+- **Story 2.3**: Environment variable mapping for authentication
+- **Story 2.4**: Project/tenant context support for multi-tenant APIs
+
+#### Epic 3: Architecture Generalization
+- **Story 3.1**: Refactor RevenueCatClient to GenericApiClient
+- **Story 3.2**: Abstract use cases to work with any OpenAPI specification
+- **Story 3.3**: Dynamic MCP tool registration based on parsed specifications
+- **Story 3.4**: Maintain clean architecture layers while adding generalization
+
+#### Epic 4: CLI Experience
+- **Story 4.1**: Command-line interface: `openapi-mcp --spec URL --auth TYPE:VAR`
+- **Story 4.2**: Interactive setup wizard for new APIs
+- **Story 4.3**: Configuration validation and testing
+- **Story 4.4**: Multiple API support in single server instance
+
+#### Epic 5: MVP Validation
+- **Story 5.1**: Support 5-10 major APIs with existing OpenAPI specs (Stripe, GitHub, Twilio)
+- **Story 5.2**: Maintain backward compatibility with RevenueCat
+- **Story 5.3**: Performance benchmarking vs current implementation
+- **Story 5.4**: Community feedback and iteration
+
+### V3: HYBRID ARCHITECTURE
+
+**Vision**: Combine OpenAPI automation with plugin extensibility for complex business logic and custom integrations.
+
+#### Epic 6: Plugin Framework
+- **Story 6.1**: Design plugin interface for custom business logic
+- **Story 6.2**: Plugin lifecycle management (load, initialize, destroy)
+- **Story 6.3**: Plugin marketplace and distribution strategy
+- **Story 6.4**: Plugin development toolkit and documentation
+
+#### Epic 7: Advanced Features
+- **Story 7.1**: Complex authentication flows (OAuth2, JWT refresh)
+- **Story 7.2**: File upload/download support
+- **Story 7.3**: Webhook handling and event streaming
+- **Story 7.4**: Custom request/response transformations
+
+### V4: ENTERPRISE FEATURES
+
+**Vision**: Production-ready features for enterprise adoption and large-scale deployments.
+
+#### Epic 8: Production Readiness
+- **Story 8.1**: Multi-tenancy and isolation
+- **Story 8.2**: Rate limiting and quota management  
+- **Story 8.3**: Monitoring, metrics, and observability
+- **Story 8.4**: High availability and clustering
+
+#### Epic 9: Security & Compliance
+- **Story 9.1**: API key rotation and management
+- **Story 9.2**: Audit logging and compliance reporting
+- **Story 9.3**: Secret management integration (HashiCorp Vault, AWS Secrets)
+- **Story 9.4**: Security scanning and vulnerability management
+
+### RESEARCH INITIATIVES
+
+#### Research 1: Protocol Extensions
+- GraphQL support for APIs beyond REST
+- Protocol Buffers/gRPC integration
+- WebSocket and real-time API support
+
+#### Research 2: AI-Powered Features
+- Automatic API discovery and documentation
+- Intelligent error handling and recovery
+- Usage pattern optimization
+
+#### Research 3: Developer Experience
+- IDE plugin development (VS Code extension)
+- Visual API explorer and testing interface
+- Automated integration testing framework
+
+### SUCCESS METRICS BY VERSION
+
+**V2 OpenAPI MVP**:
+- Support 10+ major APIs via OpenAPI specs
+- <30 second setup time for new APIs
+- Community adoption (GitHub stars, npm downloads)
+- Performance parity with V1
+
+**V3 Hybrid Architecture**:
+- 3+ community-contributed plugins
+- Enterprise pilot customers
+- 99.9% uptime in production deployments
+
+**V4 Enterprise**:
+- Fortune 500 customer adoption
+- Multi-region deployment capability
+- SOC2/ISO27001 compliance ready
+
+---
+
+*This guide provides a complete roadmap for building the MCP RevenueCat wrapper and its future evolution into a comprehensive API integration platform. Follow the phases sequentially, and you'll have a production-ready MCP server that integrates seamlessly with modern IDEs.*
