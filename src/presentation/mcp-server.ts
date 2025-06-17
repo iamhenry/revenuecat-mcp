@@ -4,6 +4,8 @@ import { Config } from '../core/config.js';
 import { Logger } from 'pino';
 import { RevenueCatClient } from '../infrastructure/revenuecat-client.js';
 import { mapHttpErrorToMcp } from '../core/errors/error-mapper.js';
+import { inputValidator, ValidationError } from '../core/validation/validator.js';
+import { ToolName } from '../core/validation/schemas.js';
 import { CreateOfferingUseCase } from '../core/use-cases/offering/create-offering.js';
 import { GetOfferingUseCase } from '../core/use-cases/offering/get-offering.js';
 import { UpdateOfferingUseCase } from '../core/use-cases/offering/update-offering.js';
@@ -374,24 +376,15 @@ export function createMCPServer(config: Config, logger: Logger): Server {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
     
-    logger.info({ tool: name, args }, 'Tool called');
-    
-    // Ensure args exists and is an object
-    if (!args || typeof args !== 'object') {
-      throw new Error('Invalid arguments provided');
-    }
+    logger.info({ tool: name }, 'Tool called');
     
     try {
+      // Validate input arguments using the validation system
+      const validatedArgs = inputValidator.validateOrThrowMcpError(name as ToolName, args);
       // Route to appropriate use case based on tool name
       switch (name) {
         case 'CreateOffering': {
-          const request: CreateOfferingRequest = {
-            name: (args as any).name as string,
-            description: (args as any).description as string | undefined,
-            is_default: (args as any).is_default as boolean | undefined,
-            packages: (args as any).packages as string[] | undefined
-          };
-          const result = await createOfferingUseCase.execute(request);
+          const result = await createOfferingUseCase.execute(validatedArgs);
           return {
             content: [
               {
@@ -403,7 +396,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetOffering': {
-          const result = await getOfferingUseCase.execute((args as any).id as string);
+          const result = await getOfferingUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
@@ -415,13 +408,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdateOffering': {
-          const request: UpdateOfferingRequest = {
-            name: (args as any).name as string | undefined,
-            description: (args as any).description as string | undefined,
-            is_default: (args as any).is_default as boolean | undefined,
-            packages: (args as any).packages as string[] | undefined
-          };
-          const result = await updateOfferingUseCase.execute((args as any).id as string, request);
+          const { id, ...updateData } = validatedArgs;
+          const result = await updateOfferingUseCase.execute(id, updateData);
           return {
             content: [
               {
@@ -433,20 +421,19 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeleteOffering': {
-          const id = (args as any).id as string;
-          await deleteOfferingUseCase.execute(id);
+          await deleteOfferingUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ success: true, message: `Offering ${id} deleted successfully` }, null, 2)
+                text: JSON.stringify({ success: true, message: `Offering ${validatedArgs.id} deleted successfully` }, null, 2)
               }
             ]
           };
         }
         
         case 'ListOfferings': {
-          const result = await listOfferingsUseCase.execute((args as any).cursor as string | undefined);
+          const result = await listOfferingsUseCase.execute(validatedArgs.cursor);
           return {
             content: [
               {
@@ -458,13 +445,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'CreateEntitlement': {
-          const request: CreateEntitlementRequest = {
-            identifier: (args as any).identifier as string,
-            name: (args as any).name as string,
-            description: (args as any).description as string | undefined,
-            product_identifiers: (args as any).product_identifiers as string[] | undefined
-          };
-          const result = await createEntitlementUseCase.execute(request);
+          const result = await createEntitlementUseCase.execute(validatedArgs);
           return {
             content: [
               {
@@ -476,7 +457,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetEntitlement': {
-          const result = await getEntitlementUseCase.execute((args as any).id as string);
+          const result = await getEntitlementUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
@@ -488,13 +469,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdateEntitlement': {
-          const request: UpdateEntitlementRequest = {
-            identifier: (args as any).identifier as string | undefined,
-            name: (args as any).name as string | undefined,
-            description: (args as any).description as string | undefined,
-            product_identifiers: (args as any).product_identifiers as string[] | undefined
-          };
-          const result = await updateEntitlementUseCase.execute((args as any).id as string, request);
+          const { id, ...updateData } = validatedArgs;
+          const result = await updateEntitlementUseCase.execute(id, updateData);
           return {
             content: [
               {
@@ -506,20 +482,19 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeleteEntitlement': {
-          const id = (args as any).id as string;
-          await deleteEntitlementUseCase.execute(id);
+          await deleteEntitlementUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ success: true, message: `Entitlement ${id} deleted successfully` }, null, 2)
+                text: JSON.stringify({ success: true, message: `Entitlement ${validatedArgs.id} deleted successfully` }, null, 2)
               }
             ]
           };
         }
         
         case 'ListEntitlements': {
-          const result = await listEntitlementsUseCase.execute((args as any).cursor as string | undefined);
+          const result = await listEntitlementsUseCase.execute(validatedArgs.cursor);
           return {
             content: [
               {
@@ -531,14 +506,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'CreateProduct': {
-          const request: CreateProductRequest = {
-            identifier: (args as any).identifier as string,
-            name: (args as any).name as string,
-            description: (args as any).description as string | undefined,
-            type: (args as any).type as 'subscription' | 'non_consumable' | 'consumable',
-            store_identifiers: (args as any).store_identifiers as { [store: string]: string } | undefined
-          };
-          const result = await createProductUseCase.execute(request);
+          const result = await createProductUseCase.execute(validatedArgs);
           return {
             content: [
               {
@@ -550,7 +518,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetProduct': {
-          const result = await getProductUseCase.execute((args as any).id as string);
+          const result = await getProductUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
@@ -562,14 +530,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdateProduct': {
-          const request: UpdateProductRequest = {
-            identifier: (args as any).identifier as string | undefined,
-            name: (args as any).name as string | undefined,
-            description: (args as any).description as string | undefined,
-            type: (args as any).type as 'subscription' | 'non_consumable' | 'consumable' | undefined,
-            store_identifiers: (args as any).store_identifiers as { [store: string]: string } | undefined
-          };
-          const result = await updateProductUseCase.execute((args as any).id as string, request);
+          const { id, ...updateData } = validatedArgs;
+          const result = await updateProductUseCase.execute(id, updateData);
           return {
             content: [
               {
@@ -581,20 +543,19 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeleteProduct': {
-          const id = (args as any).id as string;
-          await deleteProductUseCase.execute(id);
+          await deleteProductUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ success: true, message: `Product ${id} deleted successfully` }, null, 2)
+                text: JSON.stringify({ success: true, message: `Product ${validatedArgs.id} deleted successfully` }, null, 2)
               }
             ]
           };
         }
         
         case 'ListProducts': {
-          const result = await listProductsUseCase.execute((args as any).cursor as string | undefined);
+          const result = await listProductsUseCase.execute(validatedArgs.cursor);
           return {
             content: [
               {
@@ -606,13 +567,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'CreatePackage': {
-          const request: CreatePackageRequest = {
-            identifier: (args as any).identifier as string,
-            name: (args as any).name as string,
-            position: (args as any).position as number | undefined,
-            product_identifiers: (args as any).product_identifiers as string[] | undefined
-          };
-          const result = await createPackageUseCase.execute(request);
+          const result = await createPackageUseCase.execute(validatedArgs);
           return {
             content: [
               {
@@ -624,7 +579,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetPackage': {
-          const result = await getPackageUseCase.execute((args as any).id as string);
+          const result = await getPackageUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
@@ -636,13 +591,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdatePackage': {
-          const request: UpdatePackageRequest = {
-            identifier: (args as any).identifier as string | undefined,
-            name: (args as any).name as string | undefined,
-            position: (args as any).position as number | undefined,
-            product_identifiers: (args as any).product_identifiers as string[] | undefined
-          };
-          const result = await updatePackageUseCase.execute((args as any).id as string, request);
+          const { id, ...updateData } = validatedArgs;
+          const result = await updatePackageUseCase.execute(id, updateData);
           return {
             content: [
               {
@@ -654,20 +604,19 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeletePackage': {
-          const id = (args as any).id as string;
-          await deletePackageUseCase.execute(id);
+          await deletePackageUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ success: true, message: `Package ${id} deleted successfully` }, null, 2)
+                text: JSON.stringify({ success: true, message: `Package ${validatedArgs.id} deleted successfully` }, null, 2)
               }
             ]
           };
         }
         
         case 'ListPackages': {
-          const result = await listPackagesUseCase.execute((args as any).cursor as string | undefined);
+          const result = await listPackagesUseCase.execute(validatedArgs.cursor);
           return {
             content: [
               {
@@ -679,13 +628,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'CreatePriceExperiment': {
-          const request: CreatePriceExperimentRequest = {
-            name: (args as any).name as string,
-            description: (args as any).description as string | undefined,
-            status: (args as any).status as 'active' | 'inactive' | 'completed' | undefined,
-            treatment_group_percentage: (args as any).treatment_group_percentage as number
-          };
-          const result = await createPriceExperimentUseCase.execute(request);
+          const result = await createPriceExperimentUseCase.execute(validatedArgs);
           return {
             content: [
               {
@@ -697,7 +640,7 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'GetPriceExperiment': {
-          const result = await getPriceExperimentUseCase.execute((args as any).id as string);
+          const result = await getPriceExperimentUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
@@ -709,13 +652,8 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'UpdatePriceExperiment': {
-          const request: UpdatePriceExperimentRequest = {
-            name: (args as any).name as string | undefined,
-            description: (args as any).description as string | undefined,
-            status: (args as any).status as 'active' | 'inactive' | 'completed' | undefined,
-            treatment_group_percentage: (args as any).treatment_group_percentage as number | undefined
-          };
-          const result = await updatePriceExperimentUseCase.execute((args as any).id as string, request);
+          const { id, ...updateData } = validatedArgs;
+          const result = await updatePriceExperimentUseCase.execute(id, updateData);
           return {
             content: [
               {
@@ -727,20 +665,19 @@ export function createMCPServer(config: Config, logger: Logger): Server {
         }
         
         case 'DeletePriceExperiment': {
-          const id = (args as any).id as string;
-          await deletePriceExperimentUseCase.execute(id);
+          await deletePriceExperimentUseCase.execute(validatedArgs.id);
           return {
             content: [
               {
                 type: 'text',
-                text: JSON.stringify({ success: true, message: `PriceExperiment ${id} deleted successfully` }, null, 2)
+                text: JSON.stringify({ success: true, message: `PriceExperiment ${validatedArgs.id} deleted successfully` }, null, 2)
               }
             ]
           };
         }
         
         case 'ListPriceExperiments': {
-          const result = await listPriceExperimentsUseCase.execute((args as any).cursor as string | undefined);
+          const result = await listPriceExperimentsUseCase.execute(validatedArgs.cursor);
           return {
             content: [
               {
