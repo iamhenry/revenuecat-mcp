@@ -1,0 +1,42 @@
+{
+  "name": "@yourorg/revenuecat-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for RevenueCat API integration",
+  "main": "dist/index.js",
+  "bin": {
+    "revenuecat-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && esbuild dist/index.js --bundle --platform=node --outfile=dist/bundle.js",
+    "dev": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mcp",
+    "revenuecat",
+    "model-context-protocol",
+    "api",
+    "ide"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.3",
+    "dotenv-safe": "^9.1.0",
+    "pino": "^9.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "esbuild": "^0.25.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
