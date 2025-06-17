@@ -35,23 +35,28 @@
     "crud",
     "rest-api"
   ],
-  "author": "",
+  "author": {
+    "name": "Henry Moran",
+    "email": "henry@example.com"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=18"
   },
   "files": [
-    "dist/bundle.cjs"
+    "dist/bundle.cjs",
+    "README.md",
+    "LICENSE"
   ],
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourorg/revenuecat-mcp.git"
+    "url": "git+https://github.com/iamhenry/revenuecat-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/yourorg/revenuecat-mcp/issues"
+    "url": "https://github.com/iamhenry/revenuecat-mcp/issues"
   },
-  "homepage": "https://github.com/yourorg/revenuecat-mcp#readme",
+  "homepage": "https://github.com/iamhenry/revenuecat-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.3",
     "ajv": "^8.17.1",
