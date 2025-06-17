@@ -39,3 +39,10 @@ coverage/
 # Package files
 *.tgz
 *.tar.gz
+
+# Test files with sensitive data
+test-mcp.js
+
+# Personal configuration files
+project-ids.txt
+api-keys.txt
