@@ -8,7 +8,7 @@ export class RevenueCatClient {
   ) {}
 
   async request<T>(
-    method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     endpoint: string,
     body?: any,
     params?: Record<string, string>
